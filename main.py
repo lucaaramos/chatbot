@@ -1,13 +1,11 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
-# 1. Cargar GPT-2
 tokenizer = AutoTokenizer.from_pretrained("gpt2")
 model = AutoModelForCausalLM.from_pretrained("gpt2")
 
 # Definir token de padding
 tokenizer.pad_token = tokenizer.eos_token
 
-# 2. Función para generar respuesta con contexto y máscara de atención
 def generate_response(conversation_history, max_length=200):
     inputs = tokenizer(
         conversation_history,
@@ -18,7 +16,7 @@ def generate_response(conversation_history, max_length=200):
 
     outputs = model.generate(
         inputs["input_ids"],
-        attention_mask=inputs["attention_mask"],  # ← ahora la pasamos explícitamente
+        attention_mask=inputs["attention_mask"],
         max_length=max_length,
         do_sample=True,
         temperature=0.7,
@@ -40,16 +38,12 @@ while True:
             print("Bot: Goodbye!")
             break
 
-        # Guardar en historial
         conversation_history += f"User: {user_input}\nBot:"
 
-        # Generar respuesta
         full_response = generate_response(conversation_history)
-
-        # Tomar solo la parte después del último "Bot:"
+        
         bot_reply = full_response.split("Bot:")[-1].strip()
 
-        # Añadir respuesta al historial
         conversation_history += f" {bot_reply}\n"
 
         print("Bot:", bot_reply)
